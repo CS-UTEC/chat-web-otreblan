@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width">
+		<title>Char</title>
+		<script src="/static/node_modules/jquery/dist/jquery.js" charset="utf-8">
+		</script>
+		<script src="/static/node_modules/js-cookie/src/js.cookie.js" charset="utf-8">
+		</script>
+		<script src="/static/node_modules/bootstrap/dist/js/bootstrap.min.js" charset="utf-8"></script>
+		<script src="/static/js/chat.js" charset="utf-8"></script>
+		<link rel="stylesheet" href="/static/node_modules/bootstrap/dist/css/bootstrap.min.css" type="text/css" media="screen" charset="utf-8">
+	</head>
+	<body>
+		<button type="button" onclick="update_table()" class="btn btn-primary">
+			Update
+		</button>
+		<table class="table">
+			<tr>
+				<td>
+					<div id="contacts">
+					</div>
+				</td>
+				<td>
+					<div id="messages">
+					</div>
+				</td>
+			</tr>
+		</table>
+	</body>
+</html>

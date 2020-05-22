@@ -5,7 +5,7 @@ async function login()
 		'password': $('#password').val()
 	}
 	console.log("loading")
-	await new Promise(r => setTimeout(r, 1000));
+	//await new Promise(r => setTimeout(r, 1000));
 	$.post({
 		url: '/authenticate',
 		type: 'post',
@@ -15,6 +15,7 @@ async function login()
 		success: function(data)
 		{
 			console.log(data.msg)
+			//Cookies.set('id', data.id)
 			document.getElementById("ok").style.display = "block"
 		},
 		error: function(data)
