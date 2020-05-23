@@ -8,9 +8,10 @@ from flask import Flask,\
 from database import connector
 from model import entities
 from os import access, R_OK
+from isodate import parse_datetime
 
 import json
-import time
+import dateparser
 
 db = connector.Manager()
 engine = db.createEngine()
@@ -130,10 +131,13 @@ def create_messages():
     c = json.loads(request.form['values'])
     message = entities.Message(
         content=c['content'],
-        sent_on=c['sent_on'],
+        sent_on=parse_datetime(c['sent_on']),
         user_from_id=c['user_from_id'],
         user_to_id=c['user_to_id']
     )
+
+    print(message.sent_on)
+
     _session = db.getSession(engine)
     _session.add(message)
     _session.commit()
@@ -145,11 +149,11 @@ def create_messages():
 @app.route('/messages/<id>', methods=['GET'])
 def get_message(id: str):
     db_session = db.getSession(engine)
-    messages = db_session.query(entities.Messages).\
-        filter(entities.Messages.id == id)
+    messages = db_session.query(entities.Message).\
+        filter(entities.Message.id == id)
 
     for message in messages:
-        js = json.dumps(message, cls=connector.AlchemyEncoder)
+        js = json.dumps(message.to_dict())
         return Response(js, status=200, mimetype='application/json')
 
     message = {'status': 404, 'message': 'Not Found'}
@@ -163,7 +167,7 @@ def get_messages():
     _session = db.getSession(engine)
     dbResponse = _session.query(entities.Message)
     data = dbResponse[:]
-    return Response(json.dumps(data, cls=connector.AlchemyEncoder),
+    return Response(json.dumps([x.to_dict() for x in data]),
                     mimetype='application/json')
 
 
@@ -172,12 +176,14 @@ def update_message():
     _session = db.getSession(engine)
     id = request.form['key']
     message = _session.query(entities.Message).\
-        filter(entities.Mesage.id == id).first()
+        filter(entities.Message.id == id).first()
 
     c = json.loads(request.form['values'])
 
     for key in c.keys():
-        setattr(message, key, c[key])
+        setattr(message,
+                key,
+                parse_datetime(c[key]) if key == "sent_on" else c[key])
 
     _session.add(message)
     _session.commit()
@@ -196,7 +202,7 @@ def delete_message():
 
 
 # https://serversforhackers.com/c/redirect-http-to-https-nginx
-if __name__ == '__main__':
+def main():
     app.secret_key = ".."
     context = ('/etc/letsencrypt/live/otreblan.ddns.net/fullchain.pem',
                '/etc/letsencrypt/live/otreblan.ddns.net/privkey.pem')
@@ -205,3 +211,7 @@ if __name__ == '__main__':
         app.run(port=443, threaded=True, host=('0.0.0.0'), ssl_context=context)
     else:
         app.run(port=8080, threaded=True, host=('127.0.0.1'))
+
+
+if __name__ == '__main__':
+    main()

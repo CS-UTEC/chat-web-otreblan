@@ -19,5 +19,15 @@ class Message(connector.Manager.Base):
     sent_on = Column(DateTime(timezone=True))
     user_from_id = Column(Integer, ForeignKey('users.id'))
     user_to_id = Column(Integer, ForeignKey('users.id'))
+
     user_from = relationship(User, foreign_keys=[user_from_id])
     user_to = relationship(User, foreign_keys=[user_to_id])
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'content': self.content,
+            'sent_on': self.sent_on.isoformat(),
+            'user_from_id': self.user_from_id,
+            'user_to_id': self.user_to_id
+        }
