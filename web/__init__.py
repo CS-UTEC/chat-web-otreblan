@@ -3,15 +3,13 @@ from flask import Flask,\
            render_template,\
            request,\
            session,\
-           Response,\
-           send_from_directory
+           Response
 from database import connector
 from model import entities
 from os import access, R_OK
 from isodate import parse_datetime
 
 import json
-import dateparser
 
 db = connector.Manager()
 engine = db.createEngine()

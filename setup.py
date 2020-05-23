@@ -24,7 +24,7 @@ setuptools.setup(
     ],
     entry_points={
         "console_scripts": [
-            "chat-server = chat_server.server:main",
+            "chat-server = chat_server.__init__:main",
         ],
     },
     package_data={
