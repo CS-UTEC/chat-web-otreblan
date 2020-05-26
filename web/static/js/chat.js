@@ -3,11 +3,13 @@ function link_user(user){
 }
 
 function me(){
+	var id = 'null'
 	$.get({
 		url: '/users/-1',
 		type: 'get',
 		dataType: 'json',
 		contentType: 'application/json',
+		async: false,
 		success: function(data)
 		{
 			$("#contacts").html(link_user(data));
@@ -18,6 +20,7 @@ function me(){
 			console.error("Error")
 		}
 	});
+	return id
 }
 
 function others(id){
@@ -28,10 +31,12 @@ function others(id){
 		contentType: 'application/json',
 		success: function(data)
 		{
+			console.log(id)
 			for(var i = 0; i < data.length; i++){
-				console.log(data[i].id)
-				console.log(Cookies.get('id'))
-				if(data[i].id != id){
+				if(data[i].id === id){
+					//$("#contacts").append("aaaaaa");
+				}else{
+					console.log(data[i].id)
 					$("#contacts").append(link_user(data[i]));
 				}
 			}
@@ -44,6 +49,26 @@ function others(id){
 }
 
 function update_table(){
-	me()
-	others(Cookies.get("id"))
+	var user = me()
+	others(user)
+	get_messages(user)
+}
+
+function get_messages(user){
+	$.get({
+		url: '/messages',
+		type: 'get',
+		dataType: 'json',
+		contentType: 'application/json',
+		success: function(data)
+		{
+			for(var i = 0; i < data.length; i++){
+				$("#messages").append(data[i].content + "<br>");
+			}
+		},
+		error: function(data)
+		{
+			console.error("Error")
+		}
+	});
 }

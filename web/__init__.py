@@ -160,6 +160,23 @@ def get_message(id: str):
                     mimetype='application/json')
 
 
+@app.route('/messages/<user_from>/<user_to>', methods=['GET'])
+def get_users_messages(user_from: str, user_to: str):
+    db_session = db.getSession(engine)
+    messages = db_session.query(entities.Message).\
+        filter(entities.Message.id == user_from).\
+        filter(entities.Message.id == user_to)
+
+    for message in messages:
+        js = json.dumps(message.to_dict())
+        return Response(js, status=200, mimetype='application/json')
+
+    message = {'status': 404, 'message': 'Not Found'}
+    return Response(json.dumps(message),
+                    status=404,
+                    mimetype='application/json')
+
+
 @app.route('/messages', methods=['GET'])
 def get_messages():
     _session = db.getSession(engine)
