@@ -17,6 +17,7 @@ async function login()
 			console.log(data.msg)
 			//Cookies.set('id', data.id)
 			document.getElementById("ok").style.display = "block"
+			window.location='/chat.html'
 		},
 		error: function(data)
 		{

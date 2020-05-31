@@ -1,3 +1,6 @@
+var my_id = 0
+var other_users = []
+
 function link_user(user){
 	return '<div><span><a href="users/'+user.id+'">@'+user.username+'</a></span></div>'
 }
@@ -36,7 +39,8 @@ function others(id){
 				if(data[i].id === id){
 					//$("#contacts").append("aaaaaa");
 				}else{
-					console.log(data[i].id)
+					other_users.push(data[i])
+
 					$("#contacts").append(link_user(data[i]));
 				}
 			}
@@ -50,6 +54,7 @@ function others(id){
 
 function update_table(){
 	var user = me()
+	my_id = user
 	others(user)
 	get_messages(user)
 }
@@ -65,6 +70,50 @@ function get_messages(user){
 			for(var i = 0; i < data.length; i++){
 				$("#messages").append(data[i].content + "<br>");
 			}
+		},
+		error: function(data)
+		{
+			console.error("Error")
+		}
+	});
+}
+
+$(function() {
+	$("#text-box").dxTextArea({
+		placeholder: "Mensaje"
+	})
+
+	$("#user-list").dxLookup({
+		dropDownOptions: {
+			showTitle: false
+		},
+		dataSource: other_users,
+		valueExpr: 'id',
+		displayExpr: 'username'
+	})
+
+});
+
+function send() {
+	var text_box = $("#text-box").dxTextArea("instance")
+	var user_list = $("#user-list").dxLookup("instance")
+
+	console.log(text_box.option("text"))
+
+	var message = {
+		'content': text_box.option("text"),
+		'user_from_id': my_id,
+		'user_to_id': user_list.option("value")
+	}
+	$.post({
+		url: '/messages',
+		type: 'post',
+		dataType: 'json',
+		contentType: 'application/json',
+		data: JSON.stringify(message),
+		success: function(data)
+		{
+			console.log(data.msg)
 		},
 		error: function(data)
 		{

@@ -8,6 +8,7 @@ from database import connector
 from model import entities
 from os import access, R_OK
 from isodate import parse_datetime
+from datetime import datetime
 
 import json
 
@@ -126,15 +127,18 @@ def delete_user():
 @app.route('/messages', methods=['POST'])
 def create_messages():
     # c = json.loads(request.data)
-    c = json.loads(request.form['values'])
+    if(not request.is_json):
+        c = json.loads(request.form['values'])
+    else:
+        c = json.loads(request.data)
+
     message = entities.Message(
         content=c['content'],
-        sent_on=parse_datetime(c['sent_on']),
+        # sent_on=parse_datetime(c['sent_on']),
+        sent_on=datetime.now(),
         user_from_id=c['user_from_id'],
         user_to_id=c['user_to_id']
     )
-
-    print(message.sent_on)
 
     _session = db.getSession(engine)
     _session.add(message)
