@@ -67,6 +67,7 @@ function get_messages(user){
 		contentType: 'application/json',
 		success: function(data)
 		{
+			$("#messages").empty()
 			for(var i = 0; i < data.length; i++){
 				$("#messages").append(data[i].content + "<br>");
 			}
@@ -114,6 +115,7 @@ function send() {
 		success: function(data)
 		{
 			console.log(data.msg)
+			update_table()
 		},
 		error: function(data)
 		{

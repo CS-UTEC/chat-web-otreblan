@@ -16,6 +16,14 @@
 				margin-right: auto;
 				width: 40%;
 			}
+			.login-div {
+				/* https://www.w3schools.com/css/css_align.asp */
+				margin: auto;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+			}
 		</style>
 		<script src="/static/node_modules/jquery/dist/jquery.js" charset="utf-8">
 		</script>
@@ -26,7 +34,7 @@
 		<link rel="stylesheet" href="/static/node_modules/bootstrap/dist/css/bootstrap.min.css" type="text/css" media="screen" charset="utf-8">
 	</head>
 	<body>
-		<table>
+		<table class="login-div">
 			<tr>
 				<td> <input name="username" type="text" id="username"> </td>
 			</tr>

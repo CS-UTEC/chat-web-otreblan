@@ -1,16 +1,22 @@
 #!/usr/bin/env python3
-from flask import Flask,\
-           render_template,\
-           request,\
-           session,\
-           Response
-from database import connector
-from model import entities
-from os import access, R_OK
-from isodate import parse_datetime
-from datetime import datetime
+from sys import stderr
+try:
+    from flask import Flask,\
+               render_template,\
+               request,\
+               session,\
+               Response
+    from database import connector
+    from model import entities
+    from os import access, R_OK
+    from isodate import parse_datetime
+    from datetime import datetime
 
-import json
+    import json
+except ImportError:
+    print("No olvides usar pip y npm para instalar las dependencias",
+          file=stderr)
+    print("Las instrucciones están en el README.md", file=stderr)
 
 db = connector.Manager()
 engine = db.createEngine()
