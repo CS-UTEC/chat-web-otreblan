@@ -1,5 +1,25 @@
 $(function(){
 	var url = '/messages'
+
+	var users = []
+
+	$.get({
+		url: '/users',
+		type: 'get',
+		dataType: 'json',
+		contentType: 'application/json',
+		async: false,
+		success: function(data)
+		{
+			users = data
+		},
+		error: function(data)
+		{
+			console.error("Error")
+		}
+	});
+
+
 	$("#grid").dxDataGrid({
 		dataSource: DevExpress.data.AspNet.createStore({
 			key: "id",
@@ -38,10 +58,18 @@ $(function(){
 			dataType: "datetime"
 		}, {
 			dataField: "user_from_id",
-			dataType: "number"
+			lookup: {
+				dataSource: users,
+				valueExpr: "id",
+				displayExpr: "username"
+			}
 		}, {
 			dataField: "user_to_id",
-			dataType: "number"
+			lookup: {
+				dataSource: users,
+				valueExpr: "id",
+				displayExpr: "username"
+			}
 		}, ],
 	}).dxDataGrid("instance");
 });
