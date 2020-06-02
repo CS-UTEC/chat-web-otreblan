@@ -61,6 +61,12 @@ def authenticate() -> str:
     return Response('{"msg": "No"}', status=401, mimetype='application/json')
 
 
+@app.route('/authenticate', methods=['DELETE'])
+def deauthetincate():
+    session.pop('id')
+    return Response('{"msg": "ok"}', mimetype='application/json')
+
+
 @app.route('/users', methods=['POST'])
 def create_user():
     # c = json.loads(request.data)

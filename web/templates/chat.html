@@ -21,9 +21,12 @@
 			}
 		</style>
 	</head>
-	<body>
+	<body onload="update_table()">
 		<button type="button" onclick="update_table()" class="btn btn-primary">
 			Update
+		</button>
+		<button type="button" onclick="logout()" class="btn btn-danger">
+			Logout
 		</button>
 		<table class="table">
 			<tr>

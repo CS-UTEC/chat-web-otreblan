@@ -52,6 +52,22 @@ function others(id){
 	});
 }
 
+function logout(){
+	$.get({
+		url: '/authenticate',
+		type: 'delete',
+		success: function(data)
+		{
+			console.log(data.msg)
+			window.location='/login.html'
+		},
+		error: function(data)
+		{
+			console.error("Error")
+		}
+	});
+}
+
 function update_table(){
 	var user = me()
 	my_id = user
