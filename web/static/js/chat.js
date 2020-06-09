@@ -139,3 +139,10 @@ function send() {
 		}
 	});
 }
+
+function lookup() {
+	let value = $("#search").val()
+	let parent = $("#contacts")
+	console.log(parent.children())
+	// TODO hacer algo con fuzzy search y agregar cada contacto como children
+}

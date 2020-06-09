@@ -95,7 +95,7 @@ def get_user(id):
         id = session['id']
 
     users = db_session.query(entities.User).filter(entities.User.id == id)
-    db_session.close();
+    db_session.close()
     for user in users:
         js = json.dumps(user, cls=connector.AlchemyEncoder)
         return Response(js, status=200, mimetype='application/json')
@@ -105,12 +105,29 @@ def get_user(id):
                     mimetype='application/json')
 
 
+key_users = 'users'
+cache = {}
+
+
 @app.route('/users', methods=['GET'])
 def get_users():
-    _session = db.getSession(engine)
-    dbResponse = _session.query(entities.User)
-    _session.close();
-    data = dbResponse[:]
+
+    data = []
+
+    if key_users in cache:
+        # Get cache
+        data = cache[key_users]
+    else:
+        _session = db.getSession(engine)
+        dbResponse = _session.query(entities.User).\
+            order_by(entities.User.username)
+
+        _session.close()
+        data = dbResponse[:]
+
+        # Set cache
+        cache[key_users] = data
+
     return Response(json.dumps(data, cls=connector.AlchemyEncoder),
                     mimetype='application/json')
 
@@ -127,7 +144,7 @@ def update_user():
 
     _session.add(user)
     _session.commit()
-    _session.close();
+    _session.close()
     return 'Updated User'
 
 
@@ -138,7 +155,7 @@ def delete_user():
     user = _session.query(entities.User).filter(entities.User.id == id).one()
     _session.delete(user)
     _session.commit()
-    _session.close();
+    _session.close()
     return "Deleted User"
 
 
@@ -163,7 +180,7 @@ def create_messages():
     _session.commit()
     r_msg = {'msg': 'MessageCreated'}
     json_msg = json.dumps(r_msg)
-    _session.close();
+    _session.close()
     return Response(json_msg, status=201)
 
 
@@ -173,7 +190,7 @@ def get_message(id: str):
     messages = db_session.query(entities.Message).\
         filter(entities.Message.id == id)
 
-    db_session.close();
+    db_session.close()
     for message in messages:
         js = json.dumps(message.to_dict())
         return Response(js, status=200, mimetype='application/json')
@@ -191,7 +208,7 @@ def get_users_messages(user_from: str, user_to: str):
         filter(entities.Message.id == user_from).\
         filter(entities.Message.id == user_to)
 
-    db_session.close();
+    db_session.close()
     for message in messages:
         js = json.dumps(message.to_dict())
         return Response(js, status=200, mimetype='application/json')
@@ -207,7 +224,7 @@ def get_messages():
     _session = db.getSession(engine)
     dbResponse = _session.query(entities.Message)
     data = dbResponse[:]
-    _session.close();
+    _session.close()
     return Response(json.dumps([x.to_dict() for x in data]),
                     mimetype='application/json')
 
@@ -228,7 +245,7 @@ def update_message():
 
     _session.add(message)
     _session.commit()
-    _session.close();
+    _session.close()
     return 'Updated Message'
 
 
@@ -240,7 +257,7 @@ def delete_message():
         filter(entities.Message.id == id).one()
     _session.delete(message)
     _session.commit()
-    _session.close();
+    _session.close()
     return "Deleted User"
 
 
