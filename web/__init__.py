@@ -113,11 +113,18 @@ cache = {}
 def get_users():
 
     data = []
+    update_cache: bool = False
+    max_time: int = 20
 
     if key_users in cache:
-        # Get cache
-        data = cache[key_users]
+        update_cache = not (datetime.now() - cache[key_users]['time']).\
+            total_seconds() < max_time
+
+        data = cache[key_users]['data']
     else:
+        update_cache = True
+
+    if update_cache:
         _session = db.getSession(engine)
         dbResponse = _session.query(entities.User).\
             order_by(entities.User.username)
@@ -126,7 +133,7 @@ def get_users():
         data = dbResponse[:]
 
         # Set cache
-        cache[key_users] = data
+        cache[key_users] = {'data': data, 'time': datetime.now()}
 
     return Response(json.dumps(data, cls=connector.AlchemyEncoder),
                     mimetype='application/json')
