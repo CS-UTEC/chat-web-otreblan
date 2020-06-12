@@ -106,6 +106,7 @@ def get_user(id):
 
 
 key_users = 'users'
+key_messages = 'messages'
 cache = {}
 
 
@@ -228,10 +229,29 @@ def get_users_messages(user_from: str, user_to: str):
 
 @app.route('/messages', methods=['GET'])
 def get_messages():
-    _session = db.getSession(engine)
-    dbResponse = _session.query(entities.Message)
-    data = dbResponse[:]
-    _session.close()
+
+    data = []
+    update_cache: bool = False
+    max_time: int = 20
+
+    if key_messages in cache:
+        update_cache = not (datetime.now() - cache[key_messages]['time']).\
+            total_seconds() < max_time
+
+        data = cache[key_messages]['data']
+    else:
+        update_cache = True
+
+    if update_cache:
+        _session = db.getSession(engine)
+        dbResponse = _session.query(entities.Message)
+
+        data = dbResponse[:]
+        _session.close()
+
+        # Set cache
+        cache[key_messages] = {'data': data, 'time': datetime.now()}
+
     return Response(json.dumps([x.to_dict() for x in data]),
                     mimetype='application/json')
 

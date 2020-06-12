@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Sequence, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from database import connector
+from datetime import datetime
 
 
 class User(connector.Manager.Base):
@@ -24,10 +25,17 @@ class Message(connector.Manager.Base):
     user_to = relationship(User, foreign_keys=[user_to_id])
 
     def to_dict(self):
+        sent_on: str = ''
+
+        if type(self.sent_on) is datetime:
+            sent_on = self.sent_on.isoformat()
+        else:
+            sent_on = None
+
         return {
             'id': self.id,
             'content': self.content,
-            'sent_on': self.sent_on.isoformat(),
+            'sent_on': sent_on,
             'user_from_id': self.user_from_id,
             'user_to_id': self.user_to_id
         }
