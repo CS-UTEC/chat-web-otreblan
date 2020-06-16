@@ -11,6 +11,7 @@ try:
     from os import access, R_OK
     from isodate import parse_datetime
     from datetime import datetime
+    from threading import Lock
 
     import json
 except ImportError:
@@ -108,33 +109,44 @@ def get_user(id):
 key_users = 'users'
 key_messages = 'messages'
 cache = {}
+user_lock = Lock()
+messages_lock = Lock()
 
 
 @app.route('/users', methods=['GET'])
 def get_users():
 
+    def check_cache() -> bool:
+        return not (datetime.now() - cache[key_users]['time']).\
+            total_seconds() < max_time
+
     data = []
-    update_cache: bool = False
+    old_cache: bool = False
     max_time: int = 20
 
     if key_users in cache:
-        update_cache = not (datetime.now() - cache[key_users]['time']).\
-            total_seconds() < max_time
+        old_cache = check_cache()
 
         data = cache[key_users]['data']
     else:
-        update_cache = True
+        old_cache = True
 
-    if update_cache:
-        _session = db.getSession(engine)
-        dbResponse = _session.query(entities.User).\
-            order_by(entities.User.username)
+    if old_cache:
+        user_lock.acquire()
 
-        _session.close()
-        data = dbResponse[:]
+        if key_users not in cache or check_cache():
 
-        # Set cache
-        cache[key_users] = {'data': data, 'time': datetime.now()}
+            _session = db.getSession(engine)
+            dbResponse = _session.query(entities.User).\
+                order_by(entities.User.username)
+
+            _session.close()
+            data = dbResponse[:]
+
+            # Set cache
+            cache[key_users] = {'data': data, 'time': datetime.now()}
+
+        user_lock.release()
 
     return Response(json.dumps(data, cls=connector.AlchemyEncoder),
                     mimetype='application/json')
