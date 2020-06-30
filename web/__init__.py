@@ -58,7 +58,9 @@ def authenticate() -> str:
             # with app.app_context():
             # user_id = i.id
             session['id'] = i.id
-            return Response('{"msg": "ok"}', mimetype='application/json')
+
+            response = {'msg': 'ok', 'id': i.id, 'username': username}
+            return Response(json.dumps(response), mimetype='application/json')
 
     return Response('{"msg": "No"}', status=401, mimetype='application/json')
 
