@@ -229,15 +229,14 @@ def get_message(id: str):
 
 @app.route('/messages/<user_from>/<user_to>', methods=['GET'])
 def get_users_messages(user_from: str, user_to: str):
+    users = [user_from, user_to]
+
     db_session = db.getSession(engine)
     messages = db_session.query(entities.Message).\
-        filter(entities.Message.user_from_id == user_from).\
-        filter(entities.Message.user_to_id == user_to)
+        filter(entities.Message.user_from_id.in_(users)).\
+        filter(entities.Message.user_to_id.in_(users))
 
     db_session.close()
-    # for message in messages:
-    #     js = json.dumps(message.to_dict())
-    #     return Response(js, status=200, mimetype='application/json')
 
     if messages:
         return Response(json.dumps([x.to_dict() for x in messages]),
