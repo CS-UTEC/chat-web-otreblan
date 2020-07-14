@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 from sys import stderr
 try:
+    from flask_socketio import SocketIO
     from flask import Flask,\
-               render_template,\
-               request,\
-               session,\
-               Response
+        render_template,\
+        request,\
+        session,\
+        Response
+
     from database import connector
     from model import entities
     from os import access, R_OK
@@ -23,6 +25,7 @@ db = connector.Manager()
 engine = db.createEngine()
 
 app = Flask(__name__)
+socketio = SocketIO(app)
 
 user_id = 0
 
@@ -315,10 +318,15 @@ def main():
     context = ('/etc/letsencrypt/live/otreblan.ddns.net/fullchain.pem',
                '/etc/letsencrypt/live/otreblan.ddns.net/privkey.pem')
 
+    # socketio.run(app)
     if access(context[1], R_OK):
-        app.run(port=443, threaded=True, host=('0.0.0.0'), ssl_context=context)
+        socketio.run(app, port=443, host=('0.0.0.0'),
+                     certfile=context[0],
+                     keyfile=context[1],
+                     log_output=True
+                     )
     else:
-        app.run(port=8080, threaded=True, host=('127.0.0.1'))
+        socketio.run(app, port=8080, host=('127.0.0.1'))
 
 
 if __name__ == '__main__':

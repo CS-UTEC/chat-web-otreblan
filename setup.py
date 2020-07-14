@@ -19,6 +19,7 @@ setuptools.setup(
     ],
     install_requires=[
         "Flask",
+        "flask-socketio",
         "SQLAlchemy",
         "isodate",
         "psycopg2",
