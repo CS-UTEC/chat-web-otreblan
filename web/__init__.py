@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from sys import stderr
 try:
-    from flask_socketio import SocketIO
+    from flask_socketio import SocketIO, emit, join_room, leave_room
     from flask import Flask,\
         render_template,\
         request,\
@@ -25,7 +25,7 @@ db = connector.Manager()
 engine = db.createEngine()
 
 app = Flask(__name__)
-socketio = SocketIO(app)
+socketio: SocketIO = SocketIO(app)
 
 user_id = 0
 
@@ -210,6 +210,11 @@ def create_messages():
     r_msg = {'msg': 'MessageCreated'}
     json_msg = json.dumps(r_msg)
     _session.close()
+
+    socketio.emit("newMessage", {'data': 'New messages'},
+                  room=str(c['user_from_id']) + "-" + str(c['user_to_id']),
+                  namespace="/messages")
+
     return Response(json_msg, status=201)
 
 
@@ -300,6 +305,23 @@ def update_message():
     return 'Updated Message'
 
 
+@socketio.on('connect', namespace='/messages')
+def connect_message():
+    emit('info', {'data': 'Connected'})
+
+
+@socketio.on('listen', namespace='/messages')
+def listen_messages(data):
+    print("listen")
+    join_room(str(data["toId"])+"-"+str(data["fromId"]))
+
+
+@socketio.on('ignore', namespace='/messages')
+def ignore_messages(data):
+    print("ignore")
+    leave_room(str(data["toId"])+"-"+str(data["fromId"]))
+
+
 @app.route('/messages', methods=['DELETE'])
 def delete_message():
     id = request.form['key']
@@ -323,7 +345,8 @@ def main():
         socketio.run(app, port=443, host=('0.0.0.0'),
                      certfile=context[0],
                      keyfile=context[1],
-                     log_output=True
+                     log_output=True,
+                     debug=True
                      )
     else:
         socketio.run(app, port=8080, host=('127.0.0.1'))
