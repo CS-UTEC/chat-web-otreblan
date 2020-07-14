@@ -349,7 +349,7 @@ def main():
                      debug=True
                      )
     else:
-        socketio.run(app, port=8080, host=('127.0.0.1'))
+        socketio.run(app, port=443, host=('0.0.0.0'))
 
 
 if __name__ == '__main__':
