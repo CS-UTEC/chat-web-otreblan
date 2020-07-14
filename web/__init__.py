@@ -10,7 +10,7 @@ try:
 
     from database import connector
     from model import entities
-    from os import access, R_OK
+    from os import access, R_OK, getenv
     from isodate import parse_datetime
     from datetime import datetime
     from threading import Lock
@@ -349,7 +349,7 @@ def main():
                      debug=True
                      )
     else:
-        socketio.run(app, port=5000, host=('0.0.0.0'))
+        socketio.run(app, port=getenv("PORT"), host=('0.0.0.0'))
 
 
 if __name__ == '__main__':
